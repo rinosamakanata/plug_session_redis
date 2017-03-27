@@ -1,4 +1,4 @@
-PlugSessionRedis
+PlugSessionRedis for Ruby rack
 ================
 [![hex.pm version](https://img.shields.io/hexpm/v/plug_session_redis.svg)](https://hex.pm/packages/plug_session_redis)
 
