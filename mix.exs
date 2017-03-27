@@ -30,7 +30,7 @@ defmodule PlugSessionRedis.Mixfile do
     [
       {:plug, "~> 1.0", optional: true},
       {:poolboy, "~> 1.5"},
-      {:redo, "~> 2.0",
+      {:redo, "~> 2.0"},
       {:ex_marshal, "0.0.7"}}
     ]
   end
