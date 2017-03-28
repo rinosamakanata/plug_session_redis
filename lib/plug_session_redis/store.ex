@@ -68,8 +68,12 @@ defmodule PlugSessionRedis.Store do
   @max_tries 5
   defp put_new(data, {table, ttl, serializer, path}, counter \\ 0)
     when counter < @max_tries do
-      # TODO: modify rack session_id
-      sid = :crypto.strong_rand_bytes(96) |> Base.encode64
+      # Original implementation:
+      #   sid = :crypto.strong_rand_bytes(96) |> Base.encode64
+      #
+      # refs. Rack::Session::Abstract::ID#generate_sid
+      # "%0#{@sid_length}x" % Kernel.rand(2**@sidbits - 1)
+      sid = :crypto.strong_rand_bytes(16) |> Base.encode16 |> String.downcase
       case :poolboy.transaction(table, fn(client) ->
         store_data_with_ttl(client, ttl, path.(sid), serializer.encode!(data))
         end) do
