@@ -10,7 +10,7 @@ defmodule PlugSessionRedis.Store do
     signing_salt: "123456",       # Keep this private
     encryption_salt: "654321",    # Keep this private
     ttl: 360,                     # Optional, defaults to :infinity
-    serializer: CustomSerializer, # Optional, defaults to `PlugSessionRedis.BinaryEncoder`
+    serializer: CustomSerializer, # Optional, defaults to `PlugSessionRedis.RubyEncoder`
     path: &MyPath.path_for_sid/1  # Optional, defaults to the passed in session id only
   ```
 
@@ -22,14 +22,14 @@ defmodule PlugSessionRedis.Store do
   to return another binary indicating where the key should be stored/fetched from. This allows you to store data under
   a nested key so that other data can be stored within the same database. (i.e. key can become "sessions:" <> id instead)
   """
-  alias PlugSessionRedis.BinaryEncoder
+  alias PlugSessionRedis.RubyEncoder
   @behaviour Plug.Session.Store
 
   def init(opts) do
     {
       Keyword.fetch!(opts, :table),
       Keyword.get(opts, :ttl, :infinite),
-      Keyword.get(opts, :serializer, BinaryEncoder),
+      Keyword.get(opts, :serializer, RubyEncoder),
       Keyword.get(opts, :path, &__MODULE__.path/1)
     }
   end
@@ -63,15 +63,16 @@ defmodule PlugSessionRedis.Store do
     :ok
   end
 
-  def path(sid), do: sid
+  def path(sid), do: "sessions:" <> sid
 
   @max_tries 5
   defp put_new(data, {table, ttl, serializer, path}, counter \\ 0)
-      when counter < @max_tries do
-    sid = :crypto.strong_rand_bytes(96) |> Base.encode64
-    case :poolboy.transaction(table, fn(client) ->
-      store_data_with_ttl(client, ttl, path.(sid), serializer.encode!(data))
-    end) do
+    when counter < @max_tries do
+      # TODO: modify rack session_id
+      sid = :crypto.strong_rand_bytes(96) |> Base.encode64
+      case :poolboy.transaction(table, fn(client) ->
+        store_data_with_ttl(client, ttl, path.(sid), serializer.encode!(data))
+        end) do
       "OK" ->
         sid
       _ ->
