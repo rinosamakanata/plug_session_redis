@@ -9,9 +9,9 @@ defmodule PlugSessionRedis do
     Supervisor.start_link([pool_spec()], opts)
   end
 
-  @conf Application.get_env(:plug_session_redis, :config)
   def pool_spec() do
-    child_spec(@conf[:name], @conf[:pool], {:redo, @conf[:redis]})
+    conf = Application.get_env(:plug_session_redis, :config)
+    child_spec(conf[:name], conf[:pool], {:redo, conf[:redis]})
   end
 
   defp child_spec(pool_name, pool_args, redis_args) do
