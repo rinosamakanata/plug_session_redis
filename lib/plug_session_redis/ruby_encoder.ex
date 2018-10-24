@@ -21,8 +21,13 @@ defmodule PlugSessionRedis.RubyEncoder do
   end
 
   defp extract_user_id(data) do
-    result = Regex.named_captures(~r/user_idi(?<uid>.+):\x11session_type/, data)
-    result["uid"]
+    result = Regex.named_captures(~r/user_idi(?<user_id>.+):\x11session_type/, data)
+    case result do
+      nil ->
+        nil
+      true ->
+        result["user_id"]
+    end
   end
 
   # This code comes from ex_marshal.
