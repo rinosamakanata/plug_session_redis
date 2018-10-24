@@ -46,20 +46,24 @@ defmodule PlugSessionRedis.Store do
   end
 
   def put(_conn, nil, data, state) do
-    put_new(data, state)
+    # Prevent to overwrite session
+#    put_new(data, state)
+    :ok
   end
 
   def put(_conn, sid, data, {table, _, serializer, path}) do
-    :poolboy.transaction(table, fn(client) ->
-      :redo.cmd(client, ["SET", path.(sid), serializer.encode!(data)])
-    end)
+    # Prevent to overwrite session
+#    :poolboy.transaction(table, fn(client) ->
+#      :redo.cmd(client, ["SET", path.(sid), serializer.encode!(data)])
+#    end)
     sid
   end
 
   def delete(_conn, sid, {table, _, _, path}) do
-    :poolboy.transaction(table, fn(client) ->
-      :redo.cmd(client, ["DEL", path.(sid)])
-    end)
+    # Prevent to delete session
+#    :poolboy.transaction(table, fn(client) ->
+#      :redo.cmd(client, ["DEL", path.(sid)])
+#    end)
     :ok
   end
 
