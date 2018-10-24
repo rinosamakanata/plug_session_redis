@@ -16,8 +16,9 @@ defmodule PlugSessionRedis.RubyEncoder do
   end
 
   def decode!(data) do
-    user_id = extract_user_id(data)
-    %{"ra9api" => %{user_id: user_id}}
+    encoded_user_id = extract_user_id(data)
+    {decoded_user_id, _} = decode_fixnum(encoded_user_id)
+    %{"ra9api" => %{user_id: decoded_user_id}}
   end
 
   defp extract_user_id(data) do
