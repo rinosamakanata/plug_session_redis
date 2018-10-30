@@ -24,7 +24,7 @@ defmodule PlugSessionRedis.RubyEncoder do
   defp extract_user_id(data) do
     result = Regex.named_captures(~r/user_idi(?<fixnum_type>.{1})/, data)
     read_byte_count = get_read_bytes_count(result["fixnum_type"])
-    result = Regex.named_captures(~r/user_idi(?<user_id>.{#{read_byte_count}})/, data)
+    result = Regex.named_captures(~r/user_idi(?<user_id>.{#{read_byte_count}})/s, data)
     case result do
       nil ->
         nil
